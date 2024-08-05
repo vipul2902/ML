@@ -1,0 +1,35 @@
+﻿import numpy as np
+import pandas as pd
+
+
+data = pd.read_csv("ENJOYSPORT.csv")
+concepts = np.array(data.iloc[:, :-1])
+target = np.array(data.iloc[:, -1])
+
+
+def learn(concepts, target):
+    s_h = concepts[0].copy()
+    g_h = [["?" for _ in range(len(s_h))] for _ in range(len(s_h))]
+    
+    for i, h in enumerate(concepts):
+        if target[i] == "yes":
+            for x in range(len(s_h)):
+                if h[x] != s_h[x]:
+                    s_h[x] = '?'
+                    g_h[x][x] = '?'
+                else:
+                    pass
+        else:
+            for x in range(len(s_h)):
+                if h[x] != s_h[x]:
+                    g_h[x][x] = s_h[x]
+                else:
+                    g_h[x][x] = '?'
+    
+    g_h = [g for g in g_h if g != ['?' for _ in range(len(s_h))]]
+    return s_h, g_h
+
+
+s_final, g_final = learn(concepts, target)
+print("Final Specific_h:\n", s_final)
+print("Final General_h:\n", g_final)

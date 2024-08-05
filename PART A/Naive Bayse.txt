@@ -1,0 +1,31 @@
+﻿import numpy as np
+import pandas as pd
+
+
+data = pd.read_csv("play_tennis.csv")
+data.drop(["day"], axis=1, inplace=True)
+
+
+def naive_bayes_predict(data, target_name, test_instance):
+    target_value_counts = data[target_name].value_counts().to_dict()
+    proba_target_values = (data[target_name].value_counts() / data.shape[0]).to_dict()
+    predicted_target_values = {}
+
+
+    for target, value_count in target_value_counts.items():
+        attrib_proba_given_target_proba = 1
+        data_subset = data[data[target_name] == target]
+        
+        for attrib, value in test_instance.items():
+            attrib_value_conditional_proba = data_subset[data_subset[attrib] == value].shape[0] / data_subset.shape[0]
+            attrib_proba_given_target_proba *= attrib_value_conditional_proba
+        
+        target_value_proba = proba_target_values[target] * attrib_proba_given_target_proba
+        predicted_target_values[target] = target_value_proba
+        
+    return predicted_target_values
+
+
+test_instance = {"outlook": "Sunny", "temp": "Cool", "humidity": "High", "wind": "Strong"}
+prediction = naive_bayes_predict(data.copy(), data.columns[data.shape[1] - 1], test_instance)
+print("Prediction is:", prediction)
